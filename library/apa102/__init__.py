@@ -1,5 +1,9 @@
+import time
+import spidev
+import RPi.GPIO as GPIO
 
 __version__ = '0.0.1'
+
 
 class APA102():
     def __init__(self, count=1, gpio_data=14, gpio_clock=15, gpio_cs=None, brightness=1.0, gpio=None, spi=None, use_spi=True):
@@ -19,32 +23,34 @@ class APA102():
         self._gpio_data = gpio_data
         self._gpio_cs = gpio_cs
 
-        self._sof_length = 8 * 4  # SOF bytes
+        self._brightness = brightness
+
+        self._sof_length = 8 * 8  # SOF bytes
         self._eof_length = 8 * 4  # EOF bytes
         buffer_length = count * 4
         buffer_length += self._sof_length
         buffer_length += self._eof_length
 
-        self._buf = [0 for _ in range(buffer_length)]
+        self._buf = []
 
-        self._brightness = brightness
+        for _ in range(self._sof_length):
+            self._buf.append(0b00000000)
 
-        for x in range(self._sof_length, buffer_length - self._eof_length, 4):
-            self._buf[x] = 0b11100000 | int(self._brightness * 31)
+        self._buf += [0b11100000 | int(self._brightness * 31) for _ in range(buffer_length)]
+
+        for _ in range(self._eof_length):
+            self._buf.append(0b11111111)
 
         if use_spi and gpio_data == 10 and gpio_clock == 11 and gpio_cs in (7, 8):
-            import spidev
             self._spi = spidev.SpiDev(0, [8, 7].index(gpio_cs))
             self._gpio_cs = None
 
         elif use_spi and gpio_data == 20 and gpio_clock == 21 and gpio_cs in (18, 17, 16):
-            import spidev
             self._spi = spidev.SpiDev(0, [18, 17, 16].index(gpio_cs))
             self._gpio_cs = None
 
         else:
             if gpio is None:
-                import RPi.GPIO as GPIO
                 self._gpio = GPIO
                 self._gpio.setmode(GPIO.BCM)
                 self._gpio.setup([gpio_data, gpio_clock], GPIO.OUT)
@@ -79,4 +85,3 @@ class APA102():
 
         if self._gpio_cs is not None:
             self._gpio.output(self._gpio_cs, 1)
-
