@@ -1,4 +1,4 @@
 [run]
-source = {{LIBNAME}}
+source = apa102
 omit =
     .tox/*
