@@ -45,3 +45,9 @@ lights.set_pixel(2, 0, 0, 255)  # Pixel 3 to Blue
 ```
 
 Pixels are zero-indexed and accept Red, Green and Blue colour values from 0 to 255.
+
+# Changelog
+0.0.1
+-----
+
+* Initial Release
