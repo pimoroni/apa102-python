@@ -23,6 +23,8 @@ class APA102():
         self._gpio_data = gpio_data
         self._gpio_cs = gpio_cs
 
+        self._gpio = None
+        self._spi = None
         self._brightness = brightness
 
         self._sof_length = 8 * 8  # SOF bytes
@@ -50,10 +52,12 @@ class APA102():
             self._gpio_cs = None
 
         else:
-            if gpio is None:
-                self._gpio = GPIO
-                self._gpio.setmode(GPIO.BCM)
-                self._gpio.setup([gpio_data, gpio_clock], GPIO.OUT)
+            self._gpio = GPIO
+            self._gpio.setmode(GPIO.BCM)
+            self._gpio.setup([gpio_data, gpio_clock], GPIO.OUT)
+            if self._gpio_cs is not None:
+                self._gpio.setup(self._gpio_cs, GPIO.OUT)
+
 
     def _write_byte(self, byte):
         for _ in range(8):
