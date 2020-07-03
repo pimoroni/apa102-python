@@ -5,6 +5,10 @@
 [![PyPi Package](https://img.shields.io/pypi/v/apa102.svg)](https://pypi.python.org/pypi/apa102)
 [![Python Versions](https://img.shields.io/pypi/pyversions/apa102.svg)](https://pypi.python.org/pypi/apa102)
 
+A simple library to drive APA102 pixels from the Raspberry Pi, or similar SBCs.
+
+Uses either spidev or RPi.GPIO depending on the pins specified.
+
 # Pre-requisites
 
 You must enable SPI:
