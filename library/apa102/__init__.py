@@ -78,7 +78,7 @@ class APA102():
 
         """
         offset = self._sof_length + (x * 4) + 1
-        self._buf[offset:offset + 3] = [r, g, b]
+        self._buf[offset:offset + 3] = [b, g, r]
 
     def set_brightness(self, x, brightness):
         """Set global brightness of a single pixel
