@@ -6,7 +6,7 @@ __version__ = '0.0.2'
 
 
 class APA102():
-    def __init__(self, count=1, gpio_data=14, gpio_clock=15, gpio_cs=None, brightness=1.0, force_gpio=False):
+    def __init__(self, count=1, gpio_data=14, gpio_clock=15, gpio_cs=None, brightness=1.0, force_gpio=False, invert=False):
         """Initialise an APA102 device.
 
         Will use SPI if it's available on the specified data/clock pins.
@@ -22,6 +22,11 @@ class APA102():
         self._gpio_clock = gpio_clock
         self._gpio_data = gpio_data
         self._gpio_cs = gpio_cs
+        self._invert = invert
+
+        if invert:
+            # TODO Add invert support for SPI
+            force_gpio = True
 
         self._gpio = None
         self._spi = None
@@ -54,18 +59,20 @@ class APA102():
         else:
             self._gpio = GPIO
             self._gpio.setmode(GPIO.BCM)
-            self._gpio.setup([gpio_data, gpio_clock], GPIO.OUT)
+            print(gpio_data, gpio_clock)
+            self._gpio.setup(gpio_data, GPIO.OUT, initial=1 if self._invert else 0)
+            self._gpio.setup(gpio_clock, GPIO.OUT, initial=1 if self._invert else 0)
             if self._gpio_cs is not None:
                 self._gpio.setup(self._gpio_cs, GPIO.OUT)
 
 
     def _write_byte(self, byte):
         for _ in range(8):
-            self._gpio.output(self._gpio_data, byte & 0x80)
-            self._gpio.output(self._gpio_clock, 1)
+            self._gpio.output(self._gpio_data, not (byte & 0x80) if self._invert else (byte & 0x80))
+            self._gpio.output(self._gpio_clock, 0 if self._invert else 1)
             time.sleep(0)
             byte <<= 1
-            self._gpio.output(self._gpio_clock, 0)
+            self._gpio.output(self._gpio_clock, 1 if self._invert else 0)
             time.sleep(0)
 
     def set_pixel(self, x, r, g, b):
