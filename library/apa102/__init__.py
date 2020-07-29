@@ -65,7 +65,6 @@ class APA102():
             if self._gpio_cs is not None:
                 self._gpio.setup(self._gpio_cs, GPIO.OUT)
 
-
     def _write_byte(self, byte):
         for _ in range(8):
             self._gpio.output(self._gpio_data, not (byte & 0x80) if self._invert else (byte & 0x80))

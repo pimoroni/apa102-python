@@ -22,6 +22,7 @@ def test_show_spi(GPIO, spidev):
 
     del lights
 
+
 def test_show_gpio(GPIO, spidev):
     import apa102
 
