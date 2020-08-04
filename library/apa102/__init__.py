@@ -103,7 +103,7 @@ class APA102():
 
         """
         offset = self._sof_length + (x * 4)
-        self._buf[offset] = int(31 * brightness)
+        self._buf[offset] = 0b11100000 | int(31 * brightness)
 
     def show(self):
         """Display the buffer
