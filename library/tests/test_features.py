@@ -34,6 +34,6 @@ def test_show_gpio(GPIO, spidev):
 
     lights.show()
 
-    assert GPIO.output.call_count == 4898  # Count of pin transitions
+    assert GPIO.output.call_count == 482  # Count of pin transitions
 
     del lights
