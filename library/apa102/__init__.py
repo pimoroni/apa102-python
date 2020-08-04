@@ -6,7 +6,7 @@ __version__ = '0.0.2'
 
 
 class APA102():
-    def __init__(self, count=1, gpio_data=14, gpio_clock=15, gpio_cs=None, brightness=1.0, force_gpio=False, invert=False):
+    def __init__(self, count=1, gpio_data=14, gpio_clock=15, gpio_cs=None, brightness=1.0, force_gpio=False, invert=False, spi_max_speed_hz=1000000):
         """Initialise an APA102 device.
 
         Will use SPI if it's available on the specified data/clock pins.
@@ -46,12 +46,24 @@ class APA102():
         for _ in range(self._eof_length):
             self._buf.append(0b11111111)
 
-        if not force_gpio and gpio_data == 10 and gpio_clock == 11 and gpio_cs in (7, 8):
-            self._spi = spidev.SpiDev(0, [8, 7].index(gpio_cs))
+        if not force_gpio and gpio_data == 10 and gpio_clock == 11 and gpio_cs in (None, 7, 8):
+            cs_channel = 0
+            if gpio_cs is not None:
+                cs_channel = [8, 7].index(gpio_cs)
+            self._spi = spidev.SpiDev(0, cs_channel)
+            self._spi.max_speed_hz = spi_max_speed_hz
+            if gpio_cs is None:
+                self._spi.no_cs = True
             self._gpio_cs = None
 
-        elif not force_gpio and gpio_data == 20 and gpio_clock == 21 and gpio_cs in (18, 17, 16):
-            self._spi = spidev.SpiDev(0, [18, 17, 16].index(gpio_cs))
+        elif not force_gpio and gpio_data == 20 and gpio_clock == 21 and gpio_cs in (None, 18, 17, 16):
+            cs_channel = 0
+            if gpio_cs is not None:
+                cs_channel = [18, 17, 16].index(gpio_cs)
+            self._spi = spidev.SpiDev(0, cs_channel)
+            self._spi.max_speed_hz = spi_max_speed_hz
+            if gpio_cs is None:
+                self._spi.no_cs = True
             self._gpio_cs = None
 
         else:
