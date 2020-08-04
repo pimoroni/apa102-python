@@ -32,11 +32,9 @@ class APA102():
         self._spi = None
         self._brightness = brightness
 
-        self._sof_length = 8 * 8  # SOF bytes
-        self._eof_length = 8 * 4  # EOF bytes
+        self._sof_length = 4  # SOF bytes
+        self._eof_length = 4  # EOF bytes
         buffer_length = count * 4
-        buffer_length += self._sof_length
-        buffer_length += self._eof_length
 
         self._buf = []
 
@@ -102,6 +100,7 @@ class APA102():
         Outputs the buffer to connected LEDs using either bitbanged GPIO or SPI.
 
         """
+        print(self._buf)
         if self._gpio_cs is not None:
             self._gpio.output(self._gpio_cs, 0)
 
