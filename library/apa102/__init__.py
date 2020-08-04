@@ -57,7 +57,6 @@ class APA102():
         else:
             self._gpio = GPIO
             self._gpio.setmode(GPIO.BCM)
-            print(gpio_data, gpio_clock)
             self._gpio.setup(gpio_data, GPIO.OUT, initial=1 if self._invert else 0)
             self._gpio.setup(gpio_clock, GPIO.OUT, initial=1 if self._invert else 0)
             if self._gpio_cs is not None:
@@ -100,7 +99,6 @@ class APA102():
         Outputs the buffer to connected LEDs using either bitbanged GPIO or SPI.
 
         """
-        print(self._buf)
         if self._gpio_cs is not None:
             self._gpio.output(self._gpio_cs, 0)
 
