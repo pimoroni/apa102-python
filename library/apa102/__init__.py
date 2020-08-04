@@ -2,7 +2,7 @@ import time
 import spidev
 import RPi.GPIO as GPIO
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 class APA102():
