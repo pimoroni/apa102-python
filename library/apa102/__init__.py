@@ -69,6 +69,7 @@ class APA102():
         else:
             self._gpio = GPIO
             self._gpio.setmode(GPIO.BCM)
+            self._gpio.setwarnings(False)
             self._gpio.setup(gpio_data, GPIO.OUT, initial=1 if self._invert else 0)
             self._gpio.setup(gpio_clock, GPIO.OUT, initial=1 if self._invert else 0)
             if self._gpio_cs is not None:
