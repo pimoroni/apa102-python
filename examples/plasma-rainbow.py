@@ -4,7 +4,9 @@ from colorsys import hsv_to_rgb
 
 """
 
-This example should show Red, Purple, Blue, Teal, Green, Yellow in sequence.
+This example should display a rainbow scaled across your LEDs.
+
+Swap PIN_DAT and PIN_CLK for "Plasma" connector on Picade HAT
 
 """
 

@@ -5,6 +5,8 @@ from apa102 import APA102
 
 This example should show Red, Purple, Blue, Teal, Green, Yellow in sequence.
 
+Swap PIN_DAT and PIN_CLK for "Plasma" connector on Picade HAT
+
 """
 
 
