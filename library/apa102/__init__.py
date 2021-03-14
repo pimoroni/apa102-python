@@ -11,7 +11,7 @@ class APA102():
 
         Will use SPI if it's available on the specified data/clock pins.
 
-        :param pixel_count: Number of individual RGB LEDs
+        :param count: Number of individual RGB LEDs
         :param gpio_data: BCM pin for data
         :param gpio_clock: BCM pin for clock
         :param gpio_cs: BCM pin for chip-select
