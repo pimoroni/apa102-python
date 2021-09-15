@@ -50,6 +50,14 @@ lights.set_pixel(2, 0, 0, 255)  # Pixel 3 to Blue
 
 Pixels are zero-indexed and accept Red, Green and Blue colour values from 0 to 255.
 
+To set the lights, after the colours were set as wanted, use the `show` method:
+
+```python
+lights.show()
+```
+
+Without the `show` method, only the internal data is updated, the lights changes only after this function call.
+
 # Changelog
 
 0.0.3
