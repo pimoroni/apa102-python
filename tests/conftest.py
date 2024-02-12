@@ -17,13 +17,18 @@ def cleanup_apa102():
 @pytest.fixture(scope='function', autouse=False)
 def GPIO():
     """Mock RPi.GPIO module."""
-
-    GPIO = mock.MagicMock()
-    # Fudge for Python < 37 (possibly earlier)
-    sys.modules['gpiod'] = mock.MagicMock()
+    gpiochip = mock.MagicMock()
+    gpiochip.line_offset_from_id = lambda x: x
+    gpiod = mock.MagicMock()
+    gpiod.Value.INACTIVE = False
+    gpiod.Value.ACTIVE = True
+    sys.modules['gpiod'] = gpiod
+    sys.modules['gpiod.line'] = mock.MagicMock()
     sys.modules['gpiodevice'] = mock.MagicMock()
-    yield GPIO
+    sys.modules['gpiodevice'].find_chip_by_platform.return_value = gpiochip
+    yield gpiod, gpiochip
     del sys.modules['gpiod']
+    del sys.modules['gpiod.line']
     del sys.modules['gpiodevice']
 
 

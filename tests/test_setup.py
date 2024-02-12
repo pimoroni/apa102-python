@@ -16,16 +16,16 @@ def test_setup_spi(GPIO, spidev):
 def test_setup_gpio(GPIO, spidev):
     import apa102
 
+    gpiod, gpiochip = GPIO
+
     lights = apa102.APA102(3, 2, 3, 4)
 
-    GPIO.setmode.assert_has_calls((
-        mock.call(GPIO.BCM),
-    ))
-
-    GPIO.setup.assert_has_calls((
-        mock.call(2, GPIO.OUT, initial=0),
-        mock.call(3, GPIO.OUT, initial=0),
-        mock.call(4, GPIO.OUT)
+    gpiochip.request_lines.assert_has_calls((
+        mock.call(consumer="apa102", config={
+            2: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE),
+            3: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE),
+            4: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE)
+        }),
     ))
 
     del lights
@@ -34,16 +34,16 @@ def test_setup_gpio(GPIO, spidev):
 def test_setup_gpio_inverted(GPIO, spidev):
     import apa102
 
+    gpiod, gpiochip = GPIO
+
     lights = apa102.APA102(3, 2, 3, 4, invert=True)
 
-    GPIO.setmode.assert_has_calls((
-        mock.call(GPIO.BCM),
-    ))
-
-    GPIO.setup.assert_has_calls((
-        mock.call(2, GPIO.OUT, initial=1),
-        mock.call(3, GPIO.OUT, initial=1),
-        mock.call(4, GPIO.OUT)
+    gpiochip.request_lines.assert_has_calls((
+        mock.call(consumer="apa102", config={
+            2: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.ACTIVE),
+            3: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.ACTIVE),
+            4: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE)
+        }),
     ))
 
     del lights
@@ -52,16 +52,16 @@ def test_setup_gpio_inverted(GPIO, spidev):
 def test_setup_force_gpio(GPIO, spidev):
     import apa102
 
+    gpiod, gpiochip = GPIO
+
     lights = apa102.APA102(3, 10, 11, 8, force_gpio=True)
 
-    GPIO.setmode.assert_has_calls((
-        mock.call(GPIO.BCM),
-    ))
-
-    GPIO.setup.assert_has_calls((
-        mock.call(10, GPIO.OUT, initial=0),
-        mock.call(11, GPIO.OUT, initial=0),
-        mock.call(8, GPIO.OUT)
+    gpiochip.request_lines.assert_has_calls((
+        mock.call(consumer="apa102", config={
+            10: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE),
+            11: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE),
+            8: gpiod.LineSettings(direction=gpiod.Direction.OUTPUT, output_value=gpiod.Value.INACTIVE)
+        }),
     ))
 
     del lights
