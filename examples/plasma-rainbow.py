@@ -1,6 +1,7 @@
 import time
-from apa102 import APA102
 from colorsys import hsv_to_rgb
+
+from apa102 import APA102
 
 """
 
