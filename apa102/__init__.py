@@ -1,8 +1,8 @@
 import time
-import spidev
 
 import gpiod
 import gpiodevice
+import spidev
 from gpiod.line import Direction, Value
 
 __version__ = '0.0.3'

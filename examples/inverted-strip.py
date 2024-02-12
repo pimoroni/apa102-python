@@ -1,6 +1,7 @@
 import time
-from apa102 import APA102
 from colorsys import hsv_to_rgb
+
+from apa102 import APA102
 
 lights = APA102(120, 5, 6, None, brightness=0.5, invert=True)
 
