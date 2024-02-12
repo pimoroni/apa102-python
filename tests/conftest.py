@@ -20,12 +20,11 @@ def GPIO():
 
     GPIO = mock.MagicMock()
     # Fudge for Python < 37 (possibly earlier)
-    sys.modules['RPi'] = mock.Mock()
-    sys.modules['RPi'].GPIO = GPIO
-    sys.modules['RPi.GPIO'] = GPIO
+    sys.modules['gpiod'] = mock.MagicMock()
+    sys.modules['gpiodevice'] = mock.MagicMock()
     yield GPIO
-    del sys.modules['RPi']
-    del sys.modules['RPi.GPIO']
+    del sys.modules['gpiod']
+    del sys.modules['gpiodevice']
 
 
 @pytest.fixture(scope='function', autouse=False)
