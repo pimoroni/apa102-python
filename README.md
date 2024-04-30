@@ -1,13 +1,13 @@
 # APA102 Library
 
-[![Build Status](https://travis-ci.com/pimoroni/apa102-python.svg?branch=master)](https://travis-ci.com/pimoroni/apa102-python)
-[![Coverage Status](https://coveralls.io/repos/github/pimoroni/apa102-python/badge.svg?branch=master)](https://coveralls.io/github/pimoroni/apa102-python?branch=master)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/pimoroni/apa102-python/test.yml?branch=main)](https://github.com/pimoroni/apa102-python/actions/workflows/test.yml)
+[![Coverage Status](https://coveralls.io/repos/github/pimoroni/apa102-python/badge.svg?branch=main)](https://coveralls.io/github/pimoroni/apa102-python?branch=main)
 [![PyPi Package](https://img.shields.io/pypi/v/apa102.svg)](https://pypi.python.org/pypi/apa102)
 [![Python Versions](https://img.shields.io/pypi/pyversions/apa102.svg)](https://pypi.python.org/pypi/apa102)
 
-A simple library to drive APA102 pixels from the Raspberry Pi, or similar SBCs.
+A simple library to drive APA102 pixels from the Raspberry Pi, or compatible SBCs.
 
-Uses either spidev or RPi.GPIO depending on the pins specified.
+Uses either spidev or gpiod depending on the pins specified.
 
 # Pre-requisites
 
@@ -19,19 +19,35 @@ You can optionally run `sudo raspi-config` or the graphical Raspberry Pi Configu
 
 # Installing
 
-Stable library from PyPi:
+## Stable library from PyPi:
 
-* Just run `python3 -m pip install apa102`
+```
+git clone https://github.com/pimoroni/apa102-python
+cd apa102-python
+./install.sh
+```
 
-Latest/development library from GitHub:
+### Latest/development library from GitHub:
 
-* `git clone https://github.com/pimoroni/apa102-python`
-* `cd apa102-python`
-* `sudo ./install.sh`
+```
+git clone https://github.com/pimoroni/apa102-python
+cd apa102-python
+./install.sh --unstable
+```
+
+## Manual Install
+
+If you've already set up a virtual environment and just want to grab the library:
+
+```
+pip install apa102
+```
 
 # Usage
 
-The APA102 class will attempt to use spidev or RPi.GPIO depending on which pins you specify.
+The APA102 class will attempt to use spidev or gpiod depending on which pins you specify.
+
+:warning: You should prefer SPI if you have control over the pins- gpiod on a Pi is a *slow* way to bitbang SPI.
 
 For example; three RGB LEDs connected to SPI pins 10 and 11 with chip-select 8 (CE0):
 
@@ -57,26 +73,3 @@ lights.show()
 ```
 
 Without the `show` method, only the internal data is updated, the lights changes only after this function call.
-
-# Changelog
-
-0.0.3
------
-
-* Support SPI with cs None and no_cs
-* Add support for inverted output (GPIO ONLY)
-* Fix colour order to BGR
-* Fix SOF, EOF and data lengths
-* Drop noisy debug print from SPI mode
-* Fix set_brightness so it doesn't break pixel SOF
-* Add spi_max_speed_hz parameter
-
-0.0.2
------
-
-* Bugfixes and improvements
-
-0.0.1
------
-
-* Initial Release
