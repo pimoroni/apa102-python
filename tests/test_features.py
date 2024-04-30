@@ -34,6 +34,10 @@ def test_show_gpio(GPIO, spidev):
 
     lights.show()
 
-    assert lights._gpio_lines.set_value.call_count == 482  # Count of pin transitions
+    assert lights._gpio_lines.set_value.call_count == 162   # Count of clock pin transitions + chip-select
+    assert lights._gpio_lines.set_values.call_count == 160  # Count of clock pin transitions + data pin
+
+    # Should match, since we have two transitions per clock pulse. Must discount the chip-select wiggle though.
+    assert lights._gpio_lines.set_values.call_count == lights._gpio_lines.set_value.call_count - 2
 
     del lights
