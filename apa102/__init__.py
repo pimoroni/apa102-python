@@ -1,5 +1,3 @@
-import time
-
 import gpiod
 import gpiodevice
 import spidev
@@ -90,12 +88,12 @@ class APA102():
     def _write_byte(self, byte):
         for _ in range(8):
             bit = not (byte & 0x80) if self._invert else (byte & 0x80)
-            self._gpio_lines.set_value(self._gpio_data, Value.ACTIVE if bit else Value.INACTIVE)
-            self._gpio_lines.set_value(self._gpio_clock, Value.INACTIVE if self._invert else Value.ACTIVE)
-            time.sleep(0)
+            self._gpio_lines.set_values({
+                self._gpio_data: Value.ACTIVE if bit else Value.INACTIVE,
+                self._gpio_clock: Value.INACTIVE if self._invert else Value.ACTIVE
+            })
             byte <<= 1
             self._gpio_lines.set_value(self._gpio_clock, Value.ACTIVE if self._invert else Value.INACTIVE)
-            time.sleep(0)
 
     def set_pixel(self, x, r, g, b):
         """Set a single pixel
