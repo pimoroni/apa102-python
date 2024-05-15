@@ -1,8 +1,9 @@
-import time
+import gpiod
+import gpiodevice
 import spidev
-import RPi.GPIO as GPIO
+from gpiod.line import Direction, Value
 
-__version__ = '0.0.3'
+__version__ = '1.0.0'
 
 
 class APA102():
@@ -19,16 +20,18 @@ class APA102():
 
         """
 
-        self._gpio_clock = gpio_clock
-        self._gpio_data = gpio_data
-        self._gpio_cs = gpio_cs
         self._invert = invert
+
+        self._gpio_lines = None
 
         if invert:
             # TODO Add invert support for SPI
             force_gpio = True
 
         self._gpio = None
+        self._gpio_cs = None
+        self._gpio_data = None
+        self._gpio_clock = None
         self._spi = None
         self._brightness = brightness
 
@@ -54,7 +57,6 @@ class APA102():
             self._spi.max_speed_hz = spi_max_speed_hz
             if gpio_cs is None:
                 self._spi.no_cs = True
-            self._gpio_cs = None
 
         elif not force_gpio and gpio_data == 20 and gpio_clock == 21 and gpio_cs in (None, 18, 17, 16):
             cs_channel = 0
@@ -64,25 +66,34 @@ class APA102():
             self._spi.max_speed_hz = spi_max_speed_hz
             if gpio_cs is None:
                 self._spi.no_cs = True
-            self._gpio_cs = None
 
         else:
-            self._gpio = GPIO
-            self._gpio.setmode(GPIO.BCM)
-            self._gpio.setwarnings(False)
-            self._gpio.setup(gpio_data, GPIO.OUT, initial=1 if self._invert else 0)
-            self._gpio.setup(gpio_clock, GPIO.OUT, initial=1 if self._invert else 0)
-            if self._gpio_cs is not None:
-                self._gpio.setup(self._gpio_cs, GPIO.OUT)
+            gpio = gpiodevice.find_chip_by_platform()
+            pins = {"data": gpio_data, "clock": gpio_clock}
+            if gpio_cs is not None:
+                pins["chip-select"] = gpio_cs
+            gpiodevice.check_pins_available(gpio, pins)
+            self._gpio_data = gpio.line_offset_from_id(gpio_data)
+            self._gpio_clock = gpio.line_offset_from_id(gpio_clock)
+            config = {
+                self._gpio_data: gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.ACTIVE if self._invert else Value.INACTIVE),
+                self._gpio_clock: gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.ACTIVE if self._invert else Value.INACTIVE)
+            }
+            if gpio_cs is not None:
+                self._gpio_cs = gpio.line_offset_from_id(gpio_cs)
+                config[self._gpio_cs] = gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.INACTIVE)
+
+            self._gpio_lines = gpio.request_lines(consumer="apa102", config=config)
 
     def _write_byte(self, byte):
         for _ in range(8):
-            self._gpio.output(self._gpio_data, not (byte & 0x80) if self._invert else (byte & 0x80))
-            self._gpio.output(self._gpio_clock, 0 if self._invert else 1)
-            time.sleep(0)
+            bit = not (byte & 0x80) if self._invert else (byte & 0x80)
+            self._gpio_lines.set_values({
+                self._gpio_data: Value.ACTIVE if bit else Value.INACTIVE,
+                self._gpio_clock: Value.INACTIVE if self._invert else Value.ACTIVE
+            })
             byte <<= 1
-            self._gpio.output(self._gpio_clock, 1 if self._invert else 0)
-            time.sleep(0)
+            self._gpio_lines.set_value(self._gpio_clock, Value.ACTIVE if self._invert else Value.INACTIVE)
 
     def set_pixel(self, x, r, g, b):
         """Set a single pixel
@@ -113,7 +124,7 @@ class APA102():
 
         """
         if self._gpio_cs is not None:
-            self._gpio.output(self._gpio_cs, 0)
+            self._gpio_lines.set_value(self._gpio_cs, Value.INACTIVE)
 
         if self._spi is not None:
             self._spi.xfer3(self._buf)
@@ -123,4 +134,4 @@ class APA102():
                 self._write_byte(byte)
 
         if self._gpio_cs is not None:
-            self._gpio.output(self._gpio_cs, 1)
+            self._gpio_lines.set_value(self._gpio_cs, Value.ACTIVE)
